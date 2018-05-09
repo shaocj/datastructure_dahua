@@ -1,0 +1,486 @@
+#include <stdio.h>
+#include <stdlib.h>
+#define A_LENGTH 10
+#define MAX_LENGTB_INSERT_SORT 7 /*数组长度阀值*/
+void swap(int *data, int i, int j) {
+    int temp;
+    temp = *(data+i);
+   *(data+i) = *(data+j);
+   *(data+j) = temp;
+}
+//冒泡
+void bublesort(int data[],int n)
+{
+    int i , j;
+    int flag = 1;
+    for(i=0;i<n-1&&flag;i++)
+    {
+        flag=0;
+        for(j=n-2;j>=i;j--)
+        {
+            if (data[j]>data[j+1])
+            {
+
+                int temp;
+                 temp = data[j];
+                data[j] = data[j+1];
+                data[j+1] = temp;
+                flag=1;
+            }
+        }
+    }
+}
+//选择排序
+void selectsort(int data[],int n)
+{
+    int i,j,min,temp;
+    for(i=0;i<n-1;i++)
+    {
+        int min=i;
+        for(j=i+1;j<n;j++)
+        {
+            if(data[i]>data[j])
+                min=j;
+        }
+          if (i!=min)
+        {
+             int temp;
+                 temp = data[i];
+                data[i] = data[min];
+                data[min] = temp;
+        }
+    }
+
+}
+//直接插入排序
+void bInsertSort(int data[], int n)
+{
+    int i,j,temp;
+    for(i=1;i<n;i++)
+    {
+        if(data[i]<data[i-1])
+        {
+            temp=data[i];
+            for(j=i-1;data[j]>temp;j--)
+                data[j+1]=data[j];
+            data[j+1]=temp;
+        }
+    }
+}
+//希尔排序
+void shellSort(int data[],int n)
+{
+    int i,j;
+    int seg=n;
+    do
+    {
+        seg=seg/3+1;
+        for(i=seg+1;i<n;i++)
+        {
+            if(data[i]<data[i-seg])
+            {
+                int temp=data[i];
+                for(j=i-seg;j>0&&data[j]>temp;j -=seg)
+                    data[j+seg]=data[j];
+                data[j+seg]=temp;
+            }
+        }
+    }
+    while(seg>1);
+}
+//堆排序
+void heapSort(int data[],int n)
+{
+    int i;
+    for(i=n/2;i>0;i--)
+        adjustHeap(data,i,n-1);
+    for(i=n;i>1;i--)
+    {
+        swap(data,1,i);
+        adjustHeap(data,1,i-1);
+    }
+}
+void adjustHeap(int data[],int m,int n)
+{
+    int i,temp;
+     temp=data[m];
+    for(i=2*m;i<=n;i*=2)
+    {
+
+        if(i<n&&data[i]<data[i+1])
+            i++;
+        if(temp>=data[i])
+            break;
+        data[m]=data[i];
+        m=i;
+    }
+    data[m]=temp;
+
+}
+
+//递归归并
+void mergesort(int S[],int s,int t)
+{
+    int m,i;
+   // int *temp1 = (int *)malloc(sizeof(int) * A_LENGTH);
+    if(s<t)
+
+    {
+        m = (s+t)/2;
+        mergeSort(S,s,m);
+        mergeSort(S,m+1,t);
+        Merge1(S,s,m,t);
+    }
+    return;
+}
+
+void Merge1(int S[],int i,int m,int n)
+{
+    int k,l,j;
+    int *T=(int*)malloc(sizeof(int) * A_LENGTH);
+    for(j=m+1,k=0;j<=n&&i<=m;k++)
+    {
+        if (S[i]<S[j])
+            T[k]=S[i++];
+        else
+            T[k]=S[j++];
+    }
+    if(i<=m)
+    {
+        for(l=0;l<=m-i;l++)
+            T[k+l]=S[i+l];
+    }
+    if(j<=n)
+    {
+        for(l=0;l<=n-j;l++)
+            T[k+l]=S[j+l];
+    }
+
+    for(l=0;l<n-i+1;l++)//非递归去掉
+        S[i+l]=T[l];//非递归去掉
+}
+
+//非递归归并
+void Merge(int *S, int *T,int i,int m,int n)
+{
+    int k,l,j;
+
+    for(j=m+1,k=i;j<=n&&i<=m;k++)
+    {
+        if (S[i]<S[j])
+            T[k]=S[i++];
+        else
+            T[k]=S[j++];
+    }
+    if(i<=m)
+    {
+        for(l=0;l<=m-i;l++)
+            T[k+l]=S[i+l];
+    }
+    if(j<=n)
+    {
+        for(l=0;l<=n-j;l++)
+            T[k+l]=S[j+l];
+    }
+
+
+}
+
+int MergeSort(int *a)
+{
+    int k = 1;/*k用来表示每次k个元素归并*/
+    int *temp = (int *)malloc(sizeof(int) * A_LENGTH);
+
+    while (k < A_LENGTH)
+    {
+        //k每次乘以2是遵循1->2->4->8->16的二路归并元素个数的原则
+        MergePass(a, temp, k, A_LENGTH);/*先借助辅助空间归并*/
+        k *= 2;
+
+        MergePass(temp, a, k, A_LENGTH);/*再从辅助空间将排过序的序列归并回原数组*/
+        k *= 2;
+    }
+}
+
+
+int MergePass(int *S, int *T, int s, int length)
+{
+    int i = 1, l;
+
+    while (i<length-2*s+1)
+    {
+        Merge(S, T, i, i+s-1, i+2*s-1);
+        i += 2*s;
+    }/*此处的循环用于遍历数组全部元素并依照k(此处为赋值为s)来归并入辅助的数组空间中*/
+
+    /*if-else用于处理归并剩下的序列，因为已经不满足(i + 2*s - 1) < length的条件
+    * 所以需要修改Merge()函数的下标，而如果满足(i + s - 1) < length即表示
+    * i 到 i + s - 1 这段序列为归并的第一段，剩下一段为 i + s 到 length - 1，
+    * 而如果不满足if条件则说明剩下序列已经有序，直接循环赋值给目标数组即可
+    */
+    if ((i + s - 1) < length)
+    {
+        Merge(S, T, i, i+s-1, length-1);
+    }
+    else
+    {
+        for (l = i; l < length; l++)
+        {
+            T[l] = S[l];
+        }
+    }
+}
+
+//快速排序
+void Qsort(int *S,int low,int high)
+{
+    int pivot;
+    if(low<high)
+    {
+        pivot = Partition1(S,low,high);
+        Qsort(S,low,pivot-1);
+        Qsort(S,pivot+1,high);
+    }
+}
+int Partition(int *S,int low,int high)
+{
+    int pivotkey;
+     pivotkey = S[low];
+    while(low<high)
+    {
+
+        while(low<high&&S[high]>=pivotkey)
+            high--;
+        swap(S,low,high);
+        while(low<high&&S[low]<=pivotkey)
+            low++;
+        swap(S,low,high);
+    }
+    return low;
+}
+//快速排序优化
+//利用尾递归
+void Qsort1(int *S,int low,int high)
+{
+    int pivot;
+    if((high-low)>MAX_LENGTB_INSERT_SORT)//根据数组长度选择排序的方法
+    {
+        while(low<high)//尾递归
+        {
+            pivot = Partition1(S,low,high);
+            Qsort(S,low,pivot-1);
+            low=pivot+1;//尾递归
+        }
+
+    }
+    else
+        bInsertSort(S,high);
+}
+
+int Partition1(int *S,int low,int high)
+{
+    int pivotkey;
+    //优化
+    int m = low+(high-low)/2;
+    if(S[low]>S[high])
+        swap(S,low,high);
+    if(S[m]>S[high])
+        swap(S,m,high);
+    if(S[m]>S[low])
+        swap(S,m,low);
+    //优化
+     pivotkey = S[low];
+     //优化
+     int temp = pivotkey;
+     //优化
+    while(low<high)
+    {
+
+        while(low<high&&S[high]>=pivotkey)
+            high--;
+       S[low]=S[high];
+        while(low<high&&S[low]<=pivotkey)
+            low++;
+        S[high]=S[low];
+    }
+    S[low]=temp;
+    return low;
+}
+
+
+//百度
+/*--------------------选择排序---------------------*/
+void selectSort(int data[], int n) {
+    int i,j,mix,temp;
+    //每次循环数组，找出最小的元素，放在前面，前面的即为排序好的
+    for(i=0;i<n-1;i++) {
+        //假设最小元素的下标
+        int mix = i;
+        //将上面假设的最小元素与数组比较，交换出最小的元素的下标
+        for(j=i+1;j<n;j++) {
+            if(data[j] < data[mix]) {
+                mix = j;
+            }
+        }
+        //若数组中真的有比假设的元素还小，就交换
+        if(i != mix) {
+            temp = data[i];
+            data[i] = data[mix];
+            data[mix] = temp;
+        }
+    }
+}
+/*--------------------堆排序---------------------*/
+//堆排序将数组先组成二叉树，默认从数组的data[1]开始排，data[0]是
+//无效数据
+void heapsort(int data[], int n) {
+    int i;
+    //先将数组组成一棵完全二叉树
+    //从2/n开始，就是从倒数第二排结点往前开始
+    for(i=n/2;i>0;i--) {
+        heapAdjust(data, i, n);
+    }
+    //循环每个结点，将大的结点交换到堆顶
+    for(i=n;i>1;i--) {
+        swap(data, 1, i);
+        //每次交换完都要调整二叉树，将剩下的最大的结点交换到堆顶
+        heapAdjust(data, 1, i-1);
+    }
+}
+
+void heapAdjust(int data[], int i, int n) {
+    int j, temp;
+    //假设第一个结点的元素是最大的
+    temp = data[i];
+    //i结点：2*i是i结点的左结点，2*i+1是i结点的右结点
+    //把结点元素大的交换到前面
+    for(j=2*i;j<=n;j*=2) {
+        if(j < n && data[j] < data[j+1]) {
+            j++;
+        }
+        if(temp >= data[j]) {
+            break;
+        }
+        data[i] = data[j];
+        i = j;
+    }
+    data[i] = temp;
+}
+/*--------------------归并排序---------------------*/
+void mergeSort(int data[], int first, int last) {
+    int mid = 0;
+    //将数组不停的二分分组再组合，直到每组只剩一个元素
+    if(first < last) {
+        mid = (first+last)/2;
+        mergeSort(data, first, mid);
+        mergeSort(data, mid+1, last);
+        merge(data, first, mid, last);
+    }
+    return;
+}
+void merge(int data[], int low, int mid, int high) {
+    int i, k;
+    //定义一个临时数组存放传进来的无序数组排好序之后的数组
+    int *temp = (int *)malloc((high-low+1)*sizeof(int));
+    //将无序数组分成两个序列
+    int left_low = low;
+    int left_high = mid;
+    int right_low = mid+1;
+    int right_high = high;
+    //将两个序列比较排序，小的排前
+    for(k=0;left_low<=left_high && right_low<=right_high;k++) {
+        if(data[left_low]<=data[right_low]) {
+            temp[k] = data[left_low++];
+        }
+        else{
+            temp[k] = data[right_low++];
+        }
+    }
+    //左序列如果有剩下元素未排序，加到临时数组的末尾
+     if(left_low <= left_high) {
+        for(i=0;i<=left_high-left_low;i++) {
+            temp[k+i] = data[left_low+i];
+        }
+    }
+    /*if(left_low <= left_high) {
+        for(i=left_low;i<=left_high;i++) {
+            temp[k++] = data[i];
+        }
+    }*/
+    //右序列如果有剩下元素未排序，加到临时数组的末尾
+      if(right_low <= right_high) {
+        for(i=0;i<=right_high-right_low;i++) {
+            temp[k+i] = data[right_low+i];
+        }
+    }
+   /* if(right_low <= right_high) {
+        for(i=right_low;i<=right_high;i++) {
+            temp[k++] = data[i];
+        }
+    }*/
+    //将排好序的小分组转移到原数组中
+    for(i=0;i<high-low+1;i++) {
+        data[low+i] = temp[i];
+    }
+
+    free(temp);
+    return;
+}
+int main()
+{
+    int data[10] = {43, 65, 4, 23, 6, 98, 2, 65, 7, 79};
+    //int tmp[10];
+    int i;
+
+    printf("原先数组:");
+    for(i=0;i<10;i++) {
+        printf("%d    ", data[i]);
+    }
+    /*
+    printf("\n");
+    printf("冒泡排序:");
+    bublesort(data, 10);
+    for(i=0;i<10;i++) {
+        printf("%d    ", data[i]);
+    }
+     printf("\n");
+    printf("选择排序:");
+    selectsort(data, 10);
+    for(i=0;i<10;i++) {
+        printf("%d    ", data[i]);
+    }
+
+      printf("\n");
+    printf("希尔排序:");
+    shellSort(data, 10);
+    for(i=0;i<10;i++) {
+        printf("%d    ", data[i]);
+    }
+
+    int data1[11] = {-1, 43, 65, 4, 23, 6, 98, 2, 65, 7, 79};
+
+     printf("\n");
+       for(i=0;i<10;i++) {
+        printf("%d    ", data[i]);
+    }
+       printf("\n");
+    printf("堆排序:");
+    heapSort(data1, 10);
+    for(i=1;i<11;i++) {
+        printf("%d    ", data1[i]);
+    }*/
+/*printf("\n");
+    printf("非递归归并排序:");
+   MergeSort(data);
+    for(i=1;i<10;i++) {
+        printf("%d    ", data[i]);
+    }*/
+
+printf("\n");
+    printf("快速排序:");
+   Qsort(data,0,9);
+    for(i=0;i<10;i++) {
+        printf("%d    ", data[i]);
+    }
+
+}
