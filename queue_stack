@@ -1,0 +1,402 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+
+/*typedef struct Node
+{
+    int data;
+    struct Node *pNext;
+}NODE, *pNODE;
+typedef struct Stack
+{
+    pNODE top;
+}STACK, *pSTACK;
+//栈初始化
+void InitStack(pSTACK stack)
+{
+    stack->top = NULL;
+}
+
+//入栈
+void PushStack(pSTACK stack, int data)
+{
+    pNODE p_new = (pNODE)malloc(sizeof(NODE));
+
+    if (NULL == p_new)
+    {
+        printf("内存分配失败！\n");
+        exit(EXIT_FAILURE);
+    }
+
+    p_new->data = data;
+    p_new->pNext = stack->top; //这里要注意
+    stack->top = p_new;
+}
+
+//出栈
+void PopStack(pSTACK stack, int *data)
+{
+    pNODE p_delete = stack->top;
+
+    if (IsEmptyStack(stack))
+        exit(EXIT_FAILURE);
+
+    *data = p_delete->data;
+    stack->top = p_delete->pNext;
+    free(p_delete);
+    p_delete = NULL;
+}
+
+//判断栈是否为空
+int IsEmptyStack(pSTACK stack)
+{
+    if (stack->top == NULL)
+        return 1;
+    else
+        return 0;
+}
+
+//获得栈顶元素
+int GetTopStack(pSTACK stack)
+{
+    int data;
+    if (stack->top == NULL)
+        exit(EXIT_FAILURE);
+
+    data = stack->top->data;
+    return data;
+}
+
+//释放内存
+void FreeMemory(pSTACK stack)
+{
+    pNODE p_delete = NULL;
+
+    while (stack->top != NULL)
+    {
+        p_delete = stack->top;
+        stack->top = p_delete->pNext;
+        free(p_delete);
+        p_delete = NULL;
+    }
+}
+int main(void)
+{
+    int number, i, data, flag;
+    STACK s;
+    InitStack(&s);
+
+    printf("请输入入栈个数：");
+    scanf("%d", &number);
+    for (i=1; i<number+1; i++)
+    {
+        printf("请输入第%d个栈点元素值：", i);
+        scanf("%d", &data);
+        PushStack(&s, data);
+    }
+
+    PopStack(&s ,&data);
+    printf("出栈的元素值为：%d\n", data);
+
+    data = GetTopStack(&s);
+    printf("当前栈顶元素值为：%d\n", data);
+
+    FreeMemory(&s);
+    flag = IsEmptyStack(&s);
+    if (flag)
+        printf("内存释放成功！\n");
+    else
+        printf("内存释放失败！\n");
+
+    return 0;
+}
+*/
+/*****链式队列****/
+typedef struct Node
+{
+    int data;
+    struct Node *pNext;
+}NODE, *pNODE;
+
+typedef struct Queue
+{
+    pNODE front;
+    pNODE rear;
+}QUEUE, *pQUEUE;
+
+//初始化队列
+void InitQueue(pQUEUE queue)
+{
+    queue->front = (pNODE)malloc(sizeof(NODE));
+    queue->front->data = 0;
+    queue->front->pNext = NULL;
+
+    if (NULL == queue->front)
+    {
+        printf("内存分配失败！\n");
+        exit(EXIT_FAILURE);
+    }
+
+    queue->rear = queue->front;
+}
+
+//入队列
+void EnQueue(pQUEUE queue, int data)
+{
+    pNODE p_new = (pNODE)malloc(sizeof(QUEUE));
+
+    if (NULL == p_new)
+    {
+        printf("内存分配失败！\n");
+        exit(EXIT_FAILURE);
+    }
+
+    p_new->data = data;
+    p_new->pNext = NULL;
+    queue->rear->pNext = p_new;
+    queue->rear = p_new;
+}
+
+//出队列
+void DeQueue(pQUEUE queue, int *data)
+{
+    if (IsEmptyQueue(queue))
+        exit(EXIT_FAILURE);
+    pNODE p_delete = queue->front->pNext;
+    *data = p_delete->data;
+    queue->front->pNext = p_delete->pNext;
+    if (p_delete->pNext == NULL)
+        queue->rear = queue->front;
+    free(p_delete);
+    p_delete = NULL;
+}
+
+//判断队列是否为空
+int IsEmptyQueue(pQUEUE queue)
+{
+    if (queue->front == queue->rear)
+        return 1;
+    else
+        return 0;
+}
+
+//获得队头元素值
+int GetFrontQueue(pQUEUE queue)
+{
+    int data;
+    if (IsEmptyQueue(queue))
+        exit(EXIT_FAILURE);
+    data = queue->front->data;
+    return data;
+}
+
+//释放内存
+void FreeMemory(pQUEUE queue)
+{
+    pNODE p_delete = NULL;
+    while (queue->front != NULL)
+    {
+        p_delete = queue->front;
+        queue->front = p_delete->pNext;
+        if (p_delete->pNext == NULL) //如果到达最后一个节点时，队尾指针为NULL
+            queue->rear = NULL;
+        free(p_delete);
+        p_delete = NULL;
+    }
+}
+int main(void)
+{
+    int number, i, data, flag;
+    QUEUE q;
+    InitQueue(&q);
+
+    flag = IsEmptyQueue(&q);
+    if (flag)
+        printf("初始化成功！\n");
+
+    printf("请输入入队列个数：");
+    scanf("%d", &number);
+    for (i=1; i<number+1; i++)
+    {
+        printf("请输入第%d个队点元素值：", i);
+        scanf("%d", &data);
+        EnQueue(&q, data);
+    }
+
+    DeQueue(&q ,&data);
+    printf("出队列的元素值为：%d\n", data);
+
+    data = GetFrontQueue(&q);
+    printf("当前栈顶元素值为：%d\n", data);
+
+    FreeMemory(&q);
+    if (q.front == NULL && q.rear == NULL)
+        printf("内存释放成功！\n");
+    else
+        printf("内存释放失败！\n");
+
+    return 0;
+}
+/*****顺序结构*********/
+/*
+typedef int SStackEle;
+const int MAXSTACK = 20;
+
+typedef struct SSTACK
+{
+    SStackEle arrele[MAXSTACK];
+    SStackEle top;
+}SStack;
+
+typedef int SQueueEle;
+const int MAXQUEUE = 10;
+
+typedef struct SQUEUE
+{
+    SQueueEle arrele[MAXQUEUE];
+    SQueueEle front, rear;
+}SQueue;
+//初始化顺序栈
+void InitSStack(SStack &s)
+{
+    s.top = -1;
+}
+
+//压入栈
+void PushSStack(SStack &s, SStackEle ele)
+{
+    s.top++;
+    if (s.top < MAXSTACK)
+        s.arrele[s.top] = ele;
+    else
+        printf("栈满，不能进行压入操作！\n");
+}
+
+//出栈
+void PopSStack(SStack &s, SStackEle &ele)
+{
+    if (s.top < 0)
+        printf("栈空，不能进行出栈操作！\n");
+    else
+    {
+        ele = s.arrele[s.top];
+        s.top--;
+    }
+}
+
+//判断顺序栈是否为空
+bool IsemptySStack(SStack s)
+{
+    if (s.top = -1)
+        return true;
+    else
+        return false;
+}
+
+//获得栈顶元素值
+SStackEle GetTopSStack(SStack s)
+{
+    if (s.top < 0)
+        printf("栈空，不能获得栈顶元素值！\n");
+    else
+        return s.arrele[s.top];
+}
+#include "SequentialQueue.h"
+#include <stdio.h>
+
+//初始化顺序队列
+void InitSQueue(SQueue &q)
+{
+    q.front = q.rear = -1;
+}
+
+//入队列
+void EnSQueue(SQueue &q, SQueueEle ele)
+{
+    if (q.rear >= MAXQUEUE)
+        printf("队列满，不能进行入队操作！\n");
+    else
+        q.arrele[++q.rear] = ele;
+}
+
+//出队列
+void DeSQueue(SQueue &q, SQueueEle &ele)
+{
+    if (IsemptySQueue(q))
+        printf("队列空，不能进行出队操作！\n");
+    else
+        ele = q.arrele[++q.front];
+}
+
+//判断队列是否为空
+bool IsemptySQueue(SQueue q)
+{
+    if (q.front == q.rear)
+        return true;
+    else
+        return false;
+}
+
+//获得队头元素值
+SQueueEle GetFrontSQueue(SQueue q)
+{
+    if (IsemptySQueue(q))
+        printf("队空，不能获得队头元素值！\n");
+    else
+        return q.arrele[q.front + 1];
+}
+int main()
+{
+    /*顺序栈测试代码*/
+    int ele;
+    SStack s;
+    InitSStack(s);
+
+    PushSStack(s, 0);
+    PushSStack(s, 1);
+    PushSStack(s, 2);
+
+    printf("栈顶元素值为：%d\n", GetTopSStack(s));
+
+    PopSStack(s, ele);
+    printf("出栈第1个元素是：%d\n", ele);
+
+    printf("栈顶元素值为：%d\n", GetTopSStack(s));
+
+    PopSStack(s, ele);
+    printf("出栈第2个元素是：%d\n", ele);
+    PopSStack(s, ele);
+    printf("出栈第3个元素是：%d\n", ele);
+
+    PopSStack(s, ele);
+
+    if (IsemptySStack(s))
+        printf("栈为空！\n");
+    putchar('\n');
+    /*顺序队列测试代码*/
+    SQueue q;
+    InitSQueue(q);
+
+    EnSQueue(q, 0);
+    EnSQueue(q, 1);
+    EnSQueue(q, 2);
+
+    printf("队头元素值为：%d\n", GetFrontSQueue(q));
+
+    DeSQueue(q, ele);
+    printf("出队第1个元素是：%d\n", ele);
+
+    printf("队头元素值为：%d\n", GetFrontSQueue(q));
+
+    DeSQueue(q, ele);
+    printf("出队第2个元素是：%d\n", ele);
+    DeSQueue(q, ele);
+    printf("出队第3个元素是：%d\n", ele);
+
+    DeSQueue(q, ele);
+
+    if (IsemptySQueue(q))
+        printf("队列为空！\n");
+
+    return 0;
+}
