@@ -1,236 +1,393 @@
+
+//散列表查找算法（Hash）
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-
-//大话朴素
-void Nor_Index(char *s,char *p,int sLength,int pLength)
+#define OK 1
+#define ERROR 0
+#define TRUE 1
+#define FALSE 0
+#define SUCCESS 1
+#define UNSUCCESS 0
+#define HASHSIZE 7
+#define NULLKEY -32768
+typedef int Status;
+typedef struct
 {
-    int i=0;
-    int j=0;
-    while(i<sLength && j<pLength){
-        if(s[i] == p[j]){
-            i++;
-            j++;
-        }
-        else{
-            i=i-j+1;
-            j=0;
-        }
-    }
-    if(j>pLength-1){
-        int e=i-pLength;
-        printf("匹配:%d \n",e);
+  int *elem;           //基址
+  int count;           //当前数据元素个数
+}HashTable;
 
+int m=0; // 散列表表长
+
+/*初始化*/
+Status Init(HashTable *hashTable)
+{
+  int i;
+  m=HASHSIZE;
+  hashTable->elem = (int *)malloc(m * sizeof(int)); //申请内存
+  hashTable->count=m;
+  for (i=0;i<m;i++)
+  {
+    hashTable->elem[i]=NULLKEY;
+  }
+  return OK;
+}
+
+/*哈希函数(除留余数法)*/
+int Hash(int data)
+{
+  return data % m;
+}
+
+/*插入*/
+void Insert(HashTable *hashTable,int data)
+{
+  int hashAddress=Hash(data); //求哈希地址
+
+  //发生冲突
+  while(hashTable->elem[hashAddress]!=NULLKEY)
+  {
+    //利用开放定址的线性探测法解决冲突
+    hashAddress=(++hashAddress)%m;
+  }
+
+  //插入值
+  hashTable->elem[hashAddress]=data;
+}
+
+/*查找*/
+int Search(HashTable *hashTable,int data)
+{
+  int hashAddress=Hash(data); //求哈希地址
+
+  //发生冲突
+  while(hashTable->elem[hashAddress]!=data)
+  {
+    //利用开放定址的线性探测法解决冲突
+    hashAddress=(++hashAddress)%m;
+
+    if (hashTable->elem[hashAddress]==NULLKEY||hashAddress==Hash(data)) return -1;
+  }
+
+  //查找成功
+  return hashAddress;
+}
+
+/*打印结果*/
+void Display(HashTable *hashTable)
+{
+  int i;
+  printf("\n//==============================//\n");
+
+  for (i=0;i<hashTable->count;i++)
+  {
+    printf("%d ",hashTable->elem[i]);
+  }
+
+  printf("\n//==============================//\n");
+}
+//斐波那契数列
+int Fbi(int i)
+{
+    if(i<2)
+        return i==0?0:1;
+    return Fbi(i-1)+Fbi(i-2);
+}
+//顺序查找
+int sequential_search(int * S,int n,int key )
+{
+    int i=n-1;
+    while(S[i]!=key)
+        i--;
+    return i;
+}
+//有序查找：折半(必须基本有序)
+int zheban_search(int *S,int n,int key)
+{
+    int low,high,mid;
+    low=0,high=n-1;
+    while(low<=high)
+    {
+        mid=(high+low)/2;
+        if(S[mid]<key)
+            low=mid+1;
+        else if(S[mid]>key)
+            high=mid-1;
+        else
+            return mid;
+
+    }
+}
+//有序查找：插值(必须基本有序)
+int chazhi_search(int *S,int n,int key)
+{
+    int low,high,mid;
+    low=0,high=n-1;
+    while(low<=high)
+    {
+        mid=low+(high-low)*(key-S[low])/(S[high]-S[low]);
+        if(S[mid]<key)
+            low=mid+1;
+        else if(S[mid]>key)
+            high=mid-1;
+        else
+            return mid;
+
+    }
+
+}
+//有序查找：斐波那契查找
+int Fib_search(int *S,int n,int key)
+{
+    int k=0;
+    int j=n-1;
+    int low=0;
+    int high=n-1;
+    while(j>Fbi(k)-1)
+        k++;
+    for(j=n-1;j<Fbi(k)-1;j++)
+        S[j]=S[n-1];
+    /*int i=0;
+    for(i=0;i<Fbi(k)-1;i++)
+        printf("%d  ",S[i]);*/
+    while(low<=high)
+    {
+        int mid = low+Fbi(k-1)-1;
+        if(S[mid]<key)
+        {
+            low=mid+1;
+            k=k-2;
+        }
+        else if(S[mid]>key)
+        {
+            high=mid-1;
+            k=k-1;
+
+        }
+        else
+        {
+            if(mid<=n-1)
+                return mid;
+            else
+                return n-1;
+        }
+
+    }
+
+}
+//二叉树排序
+typedef struct BitNode{
+    int data;
+    struct BitNode *left,*right;
+
+}BitNode,*BitTree;
+
+int SearchBST(BitTree T,int key,BitTree f,BitTree p)
+{
+    if (!T)
+    {
+        p=f;
+        return FALSE;
+    }
+    else if(key==T->data)
+    {
+        p=T;
+        return TRUE;
+    }
+    else if(key<T->data)
+        return SearchBST(T->left,key,T,p);
+    else
+        return SearchBST(T->right,key,T,p);
+}
+//二叉排序树插入操作
+int InsertBST(BitTree T,int key)
+{
+    BitTree p,s;
+    if(!SearchBST(T,key,NULL,p))
+    {
+        s=(BitTree)malloc(sizeof(BitNode));
+        s->data=key;
+        s->left=s->right=NULL;
+        if(!p)
+            T=s;
+        else if(key<p->data)
+            p->left=s;
+        else
+            p->right=s;
+        return TRUE;
     }
     else
-        printf("失败 \n");
-
+        return FALSE;
 }
-//大话数据结构
-
-void getNext(char * p,int pLength,int * next) {
-
-    next[0] = -1;
-
-    int j = 0;
-    int i;
-
-    int k = -1;
-
-    while (j < pLength - 1) {
-
-       if (k == -1 || p[j] == p[k]) {
-
-
-            j++;
-            k++;
-           if (p[j] == p[k]) { // 当两个字符相等时要跳过
-              next[j] = next[k];
-
-           } else {
-
-              next[j] = k;
-
-           }
-
-       } else {
-
-           k = next[k];
-
-       }
-
+//创建二叉排序树
+void CreateBST(BitTree bst)
+{
+    int key;
+    bst = NULL;
+     scanf("%d", &key);
+    while(key != -1)
+    {
+        InsertBST(bst, key);
+        scanf("%d", &key);
     }
-    for(i=0;i<pLength;i++){
-        printf("改进next：%d\n",*(next+i));
-    }
-
-    //return next;
-
 }
-void getNext1(char * p,int pLength,int * next) {
-
-    next[0] = -1;
-
-    int j = 0;
-    int i;
-
-    int k = -1;
-
-    while (j < pLength - 1) {
-
-       if (k == -1 || p[j] == p[k]) {
-
-
-            j++;
-            k++;
-
-
-              next[j] = k;
-
-
-
-       } else
-
-           k = next[k];
-
-
-
+/*
+ *打印二叉树：
+ *中序遍历
+ * */
+void InOrder(BitTree root)
+{
+    if(root != NULL)
+    {
+        InOrder(root->left);
+        printf(" %d ", root->data);
+        InOrder(root->right);
     }
-    for(i=0;i<pLength;i++){
-        printf("未改进next：%d\n",next[i]);
-    }
-
-    //return next;
-
 }
- void KMP(char *s,char *p,int sLength,int pLength) {
+/*
+*****************百度二叉排序树********
+typedef struct node
+{
+    int key;
+    struct node *lchild, *rchild;
+}BSTNode, *BSTree;
 
-
-    int i = 0; // 主串的位置
-
-    int j = 0; // 模式串的位置
-    int next[255];
-
-    getNext1(p,pLength,next);
-
-    while (i < sLength && j < pLength) {
-
-       if (j == -1 || s[i] == p[j]) { // 当j为-1时，要移动的是i，当然j也要归0
-
-           i++;
-
-           j++;
-
-       } else {
-
-           // i不需要回溯了
-
-           // i = i - j + 1;
-
-           j = next[j]; // j回到指定位置
-
-       }
-
+//插入
+int InsertBST(BSTree *bst, int k)
+{
+    BSTree r, s, pre;
+    r = (BSTree)malloc(sizeof(BSTNode));
+    r->key = k;
+    r->lchild = NULL;
+    r->rchild = NULL;
+    if(*bst == NULL)
+    {
+        *bst = r;
+        return 1;
     }
-
-    if(j>pLength-1){
-        int e=i-pLength;
-        printf("匹配:%d \n",e);
-
+    pre = NULL;
+    s = *bst;
+    while(s)
+    {
+        if(k == s->key)
+                return 0;
+        else if(k < s->key)
+        {
+            pre = s;
+            s = s->lchild;
+        }
+        else
+        {
+            pre = s;
+            s = s->rchild;
+        }
     }
+    if(k < pre->key)
+            pre->lchild = r;
     else
-        printf("失败 \n");
-
+            pre->rchild = r;
+    return 1;
 }
 
 
-
-void kmpMatch(char * s,int sLength,char * p,int pLength,int *prefix)
+void CreateBST(BSTree *bst)
 {
-    int pPoint=0;
-    int i=0;
-    for(i=0; i<=sLength-pLength;i++)
+    int key;
+    *bst = NULL;
+    scanf("%d", &key);
+    while(key != -1)
     {
-
-
-        while(pPoint!=0&&(s[i]!=p[pPoint]))
-        {
-            pPoint = prefix[pPoint-1];
-        }
-        if(s[i]==p[pPoint])
-        {
-            pPoint++;
-            if(pPoint == pLength)
-            {
-                printf("找到:%d \n",i-pPoint+1);
-                //pPoint = 0;//上一个在s匹配的字符串,不能成为下一个匹配字符串的一部分
-                pPoint=prefix[pPoint-1];//上一个在s匹配的字符串,也能成为下一个匹配字符串的一部分
-            }
-        }
-
-
+        InsertBST(bst, key);
+        scanf("%d", &key);
     }
 }
 
-void kmpPrefixFunction(char *p,int length,int *prefix)
+/*
+ *打印二叉树：
+ *中序遍历
+ * */
+ /*
+void InOrder(BSTree root)
 {
-    prefix[0]=0;
-    int k = 0;//前缀的长度
-    int i;
-    for( i=1; i<length; i++)
+    if(root != NULL)
     {
-        while(k>0&&p[k]!=p[i])
-        {
-            k=prefix[k-1];
-        }
-        if(p[k]==p[i])//说明p[0...k-1]共k个都匹配了
-        {
-            k=k+1;
-        }
-        prefix[i]=k;
+        InOrder(root->lchild);
+        printf(" %d ", root->key);
+        InOrder(root->rchild);
     }
 }
 
-
-//匹配函数的朴素算法,用于比较
-void normal_match(char * s,int sLength,char * p,int pLength){
-    int k;
-    int i;
-    for(i=0;i<sLength-pLength+1;i++){
-        for(k=0;k<pLength;k++){
-            if(s[i+k]!=p[k]){
-                break;
-            }
-        }
-        if(k==pLength){
-            printf("找到:%d \n",i);
-        }
-
+/*
+ *搜索
+ * */
+ /*
+BSTree SearchBST(BSTree bst, int key)
+{
+    BSTree q;
+    q = bst;
+    //递归
+    while(q)
+    {
+            if(q->key == key)
+                    return q;
+            if(q->key > key)
+                    q=q->lchild;
+            else
+                    q=q->rchild;
     }
+    return NULL;                        //查找失败
 }
-
-
+*/
 int main()
 {
-    char *s = "abbacbcdhia";
-    char *p = "ababb";
-    int pLength = strlen(p);
-    int sLength = strlen(s);
-    //int *prefix = (int *)malloc(pLength*sizeof(int));
-    //kmpPrefixFunction(p,pLength,prefix);
-    //printf("字符串的最长前缀长度分别是:");
-    /*int i;
-    for(i=0; i<pLength; i++)
-    {
-        printf("%d\t",prefix[i]);
-    }
-    */
-    printf("\n使用KMP匹配\n");
-   // kmpMatch(s,strlen(s),p,pLength,prefix);
-   KMP(s,p,sLength,pLength);
-    printf("使用朴素算法:\n");
-   // normal_match(s,strlen(s),p,pLength);
-   Nor_Index(s,p,sLength,pLength);
+  /*
+    int data[10] = {2,4,6,7,23,43,65,65,79,98};
+    //int tmp[10]; BSTree T;
 
-    return 0;
+    int i;
+*/
+   /* BSTree T;
+    int tag = 1;
+    int m, n;
+    printf("建立二叉排序树，请输入序列以-1结束：\n");
+    CreateBST(T);
+    printf("中序遍历二叉树，序列为：\n");
+    InOrder(T);
+    printf("\n");
+    while(tag != 0)
+    {
+        printf("请输入你要查找的元素:\n");
+        scanf("%d", &n);
+        if(SearchBST(T, n) == NULL)
+                printf("抱歉查找失败!\n");
+        else
+                printf("查找成功！查找的数字为%d\n", SearchBST(T,n)->key);
+        printf("是否继续查找 是 ：请按 1 否则按 0:\n");
+        scanf("%d", &tag);
+    }*/
+   int i,j,result;
+  HashTable hashTable;
+  int arr[HASHSIZE]={13,29,27,28,26,30,38};
+
+  printf("***************Hash哈希算法***************\n");
+
+  //初始化哈希表
+  Init(&hashTable);
+
+  //插入数据
+  for (i=0;i<HASHSIZE;i++)
+  {
+    Insert(&hashTable,arr[i]);
+  }
+  Display(&hashTable);
+
+  //查找数据
+  result= Search(&hashTable,29);
+  if (result==-1)
+      printf("对不起，没有找到！\n");
+  else
+      printf("29在哈希表中的位置是:%d\n",result);
+  return 0;
+
+
 }
