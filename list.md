@@ -72,7 +72,7 @@ int AllListDelete_L(LinkList L)
 {
     LinkList p,q;
     p=L->next;
-    while(!p)
+    while(p)
     {
         q=p->next;
         free(p);
