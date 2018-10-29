@@ -39,7 +39,7 @@ void selectsort(int data[],int n)
         int min=i;
         for(j=i+1;j<n;j++)
         {
-            if(data[i]>data[j])
+            if(data[min]>data[j])
                 min=j;
         }
           if (i!=min)
@@ -138,7 +138,7 @@ void Merge1(int S[],int i,int m,int n)
 {
     int k,l,j;
     int *T=(int*)malloc(sizeof(int) * A_LENGTH);
-    for(j=m+1,k=0;j<=n&&i<=m;k++)
+    for(j=m+1,k=i;j<=n&&i<=m;k++)
     {
         if (S[i]<S[j])
             T[k]=S[i++];
