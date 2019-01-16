@@ -484,3 +484,26 @@ printf("\n");
     }
 
 }
+ //网上
+ void sort(int* nums, int begin, int end)
+{
+    int l = begin;
+    int r = end;
+    int v = nums[l+(r-l)/2];
+    while(l <= r)
+    {
+        while(nums[l] < v) l++;
+        while(nums[r] > v) r--;
+        if(l <= r)
+        {
+            int t = nums[l];
+            nums[l] = nums[r];
+            nums[r] = t;
+            l++; r--;
+        }
+    }
+    if(begin < r)
+        sort(nums, begin, r);
+    if(l < end)
+        sort(nums, l, end);
+}
