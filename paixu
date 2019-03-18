@@ -8,6 +8,14 @@ void swap(int *data, int i, int j) {
    *(data+i) = *(data+j);
    *(data+j) = temp;
 }
+//交换方法2：
+a = a^b;
+b = a^b;
+a = a^b;
+//交换方法3：
+a = a+b;
+b = a-b
+a = a -b
 //冒泡
 void bublesort(int data[],int n)
 {
