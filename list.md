@@ -145,8 +145,8 @@ int main()
 
     //初始化链表
     printf("请输入链表中初始的%d个数据：", LIST_INIT_SIZE);
-    CreateList_L_W(&L, LIST_INIT_SIZE);
-    PrintList_L(&L,"初始化的链表：");
+    CreateList_L_W(L, LIST_INIT_SIZE);
+    PrintList_L(L,"初始化的链表：");
 
     //定义插入/删除操作时位置和数值参数
     int s, v;
@@ -154,22 +154,22 @@ int main()
     //插入功能演示
     printf("请输入数据插入的位置s 和数值v ：");
     scanf("%d%d", &s, &v);
-    printf("%s", ListInsert_L(&L, s, &v) ? "插入成功.\n" : "插入失败.\n");
-    PrintList_L(&L,"插入后的链表：");
+    printf("%s", ListInsert_L(L, s, &v) ? "插入成功.\n" : "插入失败.\n");
+    PrintList_L(L,"插入后的链表：");
 
     //删除功能演示
     printf("请输入数据删除的位置s ：");
     scanf("%d", &s);
-    if (ListDelete_L(&L, s, &v))
+    if (ListDelete_L(L, s, &v))
         printf("删除成功.删除的数据是：%d\n", v);
     else
         printf("删除失败.位置有误.");
-    PrintList_L(&L,"删除后的链表：");
+    PrintList_L(L,"删除后的链表：");
 
     //查询功能演示
     printf("请输入要查询的数据位置s ：");
     scanf("%d", &s);
-    GetElem_L(&L,s,&v);
+    GetElem_L(L,s,&v);
     printf("第%d个数是：%d\n\n",s,v);
 
     system("pause");
