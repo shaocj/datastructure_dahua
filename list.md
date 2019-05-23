@@ -11,7 +11,12 @@ typedef struct LNode
     Elemtype data;
     struct LNode *next;
 }LNode,*LinkList;
-
+linkList InitListNode(LinkList R)
+{
+    R = (LinkList) malloc(sizeof(ListNode));
+    R->next = NULL;
+    return R;
+}
 //获取链表中指定位置的数据
 int GetElem_L(LinkList L, int i, Elemtype *e)
 {
@@ -141,8 +146,8 @@ int PrintList_L(LinkList L, char* s){
 int main()
 {
     //定义链表
-    LinkList L;
-
+    LinkList L,R;
+    L=InitListNode(R);
     //初始化链表
     printf("请输入链表中初始的%d个数据：", LIST_INIT_SIZE);
     CreateList_L_W(L, LIST_INIT_SIZE);
