@@ -126,74 +126,67 @@ void adjustHeap(int data[],int m,int n)
 
 }
 
-//递归归并
-void mergesort(int S[],int s,int t)
-{
-    int m,i;
-   // int *temp1 = (int *)malloc(sizeof(int) * A_LENGTH);
-    if(s<t)
-
-    {
-        m = (s+t)/2;
-        mergeSort(S,s,m);
-        mergeSort(S,m+1,t);
-        Merge1(S,s,m,t);
+/*--------------------归并排序---------------------*/
+void mergeSort(int data[], int first, int last) {
+    int mid = 0;
+    //将数组不停的二分分组再组合，直到每组只剩一个元素
+    if(first < last) {
+        mid = (first+last)/2;
+        mergeSort(data, first, mid);
+        mergeSort(data, mid+1, last);
+        merge(data, first, mid, last);
     }
     return;
 }
+void merge(int data[], int low, int mid, int high) {
+    int i, k;
+    //定义一个临时数组存放传进来的无序数组排好序之后的数组
+    int *temp = (int *)malloc((high-low+1)*sizeof(int));
+    //将无序数组分成两个序列
+    int left_low = low;
+    int left_high = mid;
+    int right_low = mid+1;
+    int right_high = high;
+    //将两个序列比较排序，小的排前
+    for(k=0;left_low<=left_high && right_low<=right_high;k++) {
+        if(data[left_low]<=data[right_low]) {
+            temp[k] = data[left_low++];
+        }
+        else{
+            temp[k] = data[right_low++];
+        }
+    }
+    //左序列如果有剩下元素未排序，加到临时数组的末尾
+     if(left_low <= left_high) {
+        for(i=0;i<=left_high-left_low;i++) {
+            temp[k+i] = data[left_low+i];
+        }
+    }
+    /*if(left_low <= left_high) {
+        for(i=left_low;i<=left_high;i++) {
+            temp[k++] = data[i];
+        }
+    }*/
+    //右序列如果有剩下元素未排序，加到临时数组的末尾
+      if(right_low <= right_high) {
+        for(i=0;i<=right_high-right_low;i++) {
+            temp[k+i] = data[right_low+i];
+        }
+    }
+   /* if(right_low <= right_high) {
+        for(i=right_low;i<=right_high;i++) {
+            temp[k++] = data[i];
+        }
+    }*/
+    //将排好序的小分组转移到原数组中
+    for(i=0;i<high-low+1;i++) {
+        data[low+i] = temp[i];
+    }
 
-void Merge1(int S[],int i,int m,int n)
-{
-    int k,l,j;
-    int *T=(int*)malloc(sizeof(int) * A_LENGTH);
-    for(j=m+1,k=i;j<=n&&i<=m;k++)
-    {
-        if (S[i]<S[j])
-            T[k]=S[i++];
-        else
-            T[k]=S[j++];
-    }
-    if(i<=m)
-    {
-        for(l=0;l<=m-i;l++)
-            T[k+l]=S[i+l];
-    }
-    if(j<=n)
-    {
-        for(l=0;l<=n-j;l++)
-            T[k+l]=S[j+l];
-    }
-
-    for(l=0;l<n-i+1;l++)//非递归去掉
-        S[i+l]=T[l];//非递归去掉
+    free(temp);
+    return;
 }
-
-//非递归归并
-void Merge(int *S, int *T,int i,int m,int n)
-{
-    int k,l,j;
-
-    for(j=m+1,k=i;j<=n&&i<=m;k++)
-    {
-        if (S[i]<S[j])
-            T[k]=S[i++];
-        else
-            T[k]=S[j++];
-    }
-    if(i<=m)
-    {
-        for(l=0;l<=m-i;l++)
-            T[k+l]=S[i+l];
-    }
-    if(j<=n)
-    {
-        for(l=0;l<=n-j;l++)
-            T[k+l]=S[j+l];
-    }
-
-
-}
-
+非递归
 int MergeSort(int *a)
 {
     int k = 1;/*k用来表示每次k个元素归并*/
@@ -374,66 +367,7 @@ void heapAdjust(int data[], int i, int n) {
     }
     data[i] = temp;
 }
-/*--------------------归并排序---------------------*/
-void mergeSort(int data[], int first, int last) {
-    int mid = 0;
-    //将数组不停的二分分组再组合，直到每组只剩一个元素
-    if(first < last) {
-        mid = (first+last)/2;
-        mergeSort(data, first, mid);
-        mergeSort(data, mid+1, last);
-        merge(data, first, mid, last);
-    }
-    return;
-}
-void merge(int data[], int low, int mid, int high) {
-    int i, k;
-    //定义一个临时数组存放传进来的无序数组排好序之后的数组
-    int *temp = (int *)malloc((high-low+1)*sizeof(int));
-    //将无序数组分成两个序列
-    int left_low = low;
-    int left_high = mid;
-    int right_low = mid+1;
-    int right_high = high;
-    //将两个序列比较排序，小的排前
-    for(k=0;left_low<=left_high && right_low<=right_high;k++) {
-        if(data[left_low]<=data[right_low]) {
-            temp[k] = data[left_low++];
-        }
-        else{
-            temp[k] = data[right_low++];
-        }
-    }
-    //左序列如果有剩下元素未排序，加到临时数组的末尾
-     if(left_low <= left_high) {
-        for(i=0;i<=left_high-left_low;i++) {
-            temp[k+i] = data[left_low+i];
-        }
-    }
-    /*if(left_low <= left_high) {
-        for(i=left_low;i<=left_high;i++) {
-            temp[k++] = data[i];
-        }
-    }*/
-    //右序列如果有剩下元素未排序，加到临时数组的末尾
-      if(right_low <= right_high) {
-        for(i=0;i<=right_high-right_low;i++) {
-            temp[k+i] = data[right_low+i];
-        }
-    }
-   /* if(right_low <= right_high) {
-        for(i=right_low;i<=right_high;i++) {
-            temp[k++] = data[i];
-        }
-    }*/
-    //将排好序的小分组转移到原数组中
-    for(i=0;i<high-low+1;i++) {
-        data[low+i] = temp[i];
-    }
 
-    free(temp);
-    return;
-}
 int main()
 {
     int data[10] = {43, 65, 4, 23, 6, 98, 2, 65, 7, 79};
@@ -492,26 +426,4 @@ printf("\n");
     }
 
 }
- //网上
- void sort(int* nums, int begin, int end)
-{
-    int l = begin;
-    int r = end;
-    int v = nums[l+(r-l)/2];
-    while(l <= r)
-    {
-        while(nums[l] < v) l++;
-        while(nums[r] > v) r--;
-        if(l <= r)
-        {
-            int t = nums[l];
-            nums[l] = nums[r];
-            nums[r] = t;
-            l++; r--;
-        }
-    }
-    if(begin < r)
-        sort(nums, begin, r);
-    if(l < end)
-        sort(nums, l, end);
-}
+
