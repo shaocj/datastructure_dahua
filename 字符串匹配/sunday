@@ -1,0 +1,177 @@
+Sunday算法
+https://www.cnblogs.com/Syhawk/p/4077295.html
+ 
+
+　　　　Sunday算法是Daniel M.Sunday于1990年提出的字符串模式匹配。相对比较KMP和BM
+
+　　算法而言，简单了许多。
+
+　　　　原理与BM算法相仿，有点像其删减版，所以其时间复杂度和BM算法差不多，平均性能的
+
+　　时间复杂度也为O(n)，最差情况的时间复杂度为O(n * m)，但是要容易理解。
+
+ 
+
+　　　　匹配原理：从前往后匹配，如果遇到不匹配情况判断母串S参与匹配的最后一位的下一位字符
+
+　　，如果该字符出现在模板串T中，选择最右出现的位置进 行对齐；否则直接跳过该匹配区域。
+
+ 
+
+　　　　原理看着都这么繁琐，而且难懂，还是给读者上图吧：
+
+ 
+
+　　　　母串S：
+
+　　　　　　S  E  A  R  C  H  S  U  B  S  T  R  I  N  G
+
+ 
+
+　　　　模板串T：
+
+　　　　　　S  U  B  S  T  R  I  N  G
+
+ 
+
+　　　　开始匹配：
+
+ 
+
+　　　　　　S  E  A  R  C  H  S  U  B  S  T  R  I  N  G
+
+　　　　　　↨
+
+　　　　　　S  U  B  S  T  R  I  N  G
+
+ 
+
+　　　　继续下一字符匹配：
+
+ 
+
+　　　　　　S  E  A  R  C  H  S  U  B  S  T  R  I  N  G
+
+　　　　　　　 ↨
+
+　　　　　　S  U  B  S  T  R  I  N  G
+
+ 
+
+　　　　出现不匹配情况，查找母串参与匹配的最后一位字符的下一字符，上图中S中最后一位参与
+
+　　匹配的字符是颜色为蓝色的字符’B’，其下一字符为’S’，在T中，字符’S’出现两次，按照原理，
+
+　　选择最右位置出现的’S’进行对齐，那么可以得到：
+
+ 
+
+　　　　　　S  E  A  R  C  H  S  U  B  S  T  R  I  N  G
+
+　　　　　　　　　　　　　  ↨
+
+　　　　　　　　　    　　　 S  U  B  S  T  R  I  N  G
+
+ 
+
+　　　　直接跳过大片区域。
+
+ 
+
+　　　　假设母串S为：
+
+　　　　　　S  E  A  R  C  H  S  U  B  Z  T  R  I  N  G
+
+ 
+
+　　　　那么当匹配到上述情况时，字符’Z’在T中没有出现，那么就可以得到下面的情况：
+
+ 
+
+　　　　　　S  E  A  R  C  H  S  U  B  Z  T  R  I  N  G
+
+         　　　　 　　　　　　　　　　      ↨
+
+　　　　      　　　　　　　　　　　      S  U  B  S  T  R  I  N  G
+
+ 
+
+　　　　跳过的区域很大吧。
+
+　　　　ok，这就是其原理的两种情况，很简单吧，下面给出代码解释：
+
+　　　　注：S表示母串，T表示模板串
+    
+    
+    
+    int moveLength[MAXSIZE];    //    匹配不成功时的移动步长，默认初始化
+　　
+　　int Sunday(const string& S, const string &T) {
+　　　　getMoveLength(T);
+　　
+　　　　int tLen = T.size();
+　　　　int sLen = S.size();
+　　　　int i = 0;    //    S遍历下标
+　　　　while(i < sLen) {
+　　　　　　int j = 0;
+　　　　　　//    符合条件下标就继续右移
+　　　　　　for(  ; j < tLen && i + j < sLen && S[i + j] == T[j]; ++ j) ;
+　　　　　　//    遍历结束，判断遍历情况
+　　　　　　if(j >= tLen) return i;
+　　　　　　//    查找不成功，那么S下标右移
+　　　　　　if(i + tLen >= sLen) 
+　　　　　　return -1;
+　　　　　　i += moveLength[S[i + tLen]];
+　　　　}
+　　
+　　　　return -1;
+　　}
+  匹配过程很简单，相信读者很容易理解。
+
+　　　　那么，需要求解moveLength数组，下面给出其求解代码：
+
+ int MAXSIZE = 256;    //    字符串种类数，视情况而定
+
+　　void getMoveLength(const string &T) {
+　　　　int tLen = T.size();
+　　　　//    默认S中的任何字符均不出现在T中，那么每次移动的距离为T的长度 + 1
+　　　　for(int i = 0; i < MAXSIZE; ++ i)
+　　　　　　moveLength[i] = tLen + 1;
+　　
+　　　　//    查找能够出现在T中的字符，若一个字符出现多次，选择最右位置的字符，所以T的下标遍历从0开始
+　　　　for(int i = 0; T[i]; ++ i)
+　　　　　　moveLength[T[i]] = tLen - i;
+　　}
+  　　ok,代码解释完毕，非常简单。
+
+　　　　下面给出完整代码：
+    int MAXSIZE = 256;
+　　int moveLength[MAXSIZE];
+
+　　void getMoveLength(const string &T) {
+　　　　int tLen = T.size();
+　　　　for(int i = 0; i < MAXSIZE; ++ i)
+　　　　　　moveLength[i] = tLen + 1;
+　　
+　　　　for(int i = 0; T[i]; ++ i)
+　　　　　　moveLength[T[i]] = tLen - i;
+　　}
+　　
+　　int Sunday(const string& S, const string &T) {
+　　　　getMoveLength(T);
+　　
+　　　　int tLen = T.size();
+　　　　int sLen = S.size();
+　　　　int i = 0;    
+　　　　while(i < sLen) {
+　　　　　　int j = 0;
+　　　　　　for(  ; j < tLen && i + j < sLen && S[i + j] == T[j]; ++ j) ;
+　　
+　　　　　　if(j >= tLen) return i;
+　　　　　　if(i + tLen > sLen) 
+　　　　　　　　return -1;
+　　　　　　i += moveLength[S[i + tLen]];
+　　　　}
+　　
+　　　　return -1;
+　　}
