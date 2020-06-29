@@ -38,8 +38,8 @@ int GetElem_L(LinkList L, int i, Elemtype *e)
 int ListInsert_L(LinkList L, int i, Elemtype *e)
 {
    LinkList p,s;
-    p = L->next;
-    int j = 1;
+    p = L;//p = L->next;
+    int j = 0;//int j = 1;
     while (p&&j<i-1)
     {
         p = p->next;
@@ -58,8 +58,8 @@ int ListInsert_L(LinkList L, int i, Elemtype *e)
 int ListDelete_L(LinkList L, int i, Elemtype *e)
 {
     LinkList p, q;
-    p = L->next;
-    int j = 1;
+   p = L;//p = L->next;
+    int j = 0;//int j = 1;
     while (p->next && j<i - 1)
     {
         p = p->next;
