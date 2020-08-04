@@ -1,3 +1,11 @@
 https://blog.csdn.net/ky_heart/article/details/53587273
 https://blog.csdn.net/u013588966/article/details/46709491
 https://blog.csdn.net/weibo1230123/article/details/80512727
+
+给字符串赋值
+char string[20]={0};
+  你不能通过 string="hello";这种方式赋值。但是在字符串初始化的时候可以通过这种方式赋值，char string[20]="hello"; //这是正确的，只有在初始化的时候是正确的。除了初始化之外的赋值必须通过strcpy类似的拷贝字符串函数来完成字符串的赋值。
+但字符指针就比较随意：
+char *string="hello";
+string="helloworld";
+随意用，想怎么用就怎么用，不用通过strcpy来操作。
